@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>簡單迷宮遊戲</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f0f0f0;
+    }
+    #game-board {
+      display: grid;
+      grid-template-columns: repeat(10, 30px);
+      grid-template-rows: repeat(10, 30px);
+      gap: 2px;
+    }
+    .cell {
+      width: 30px;
+      height: 30px;
+      background-color: #fff;
+      border: 1px solid #ddd;
+    }
+    .wall {
+      background-color: #333;
+    }
+    .player {
+      background-color: #4caf50;
+    }
+    .exit {
+      background-color: #f44336;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="game-board"></div>
+
+  <script>
+    // 初始化遊戲變數
+    const boardSize = 10;
+    const player = { x: 0, y: 0 };  // 玩家初始位置
+    const exit = { x: 9, y: 9 };    // 迷宮出口位置
+    let maze = [];
+    
+    // 生成迷宮
+    function generateMaze() {
+      maze = Array(boardSize).fill().map(() => Array(boardSize).fill(0));
+      // 在迷宮中隨機放置牆壁
+      for (let i = 0; i < 30; i++) {
+        const x = Math.floor(Math.random() * boardSize);
+        const y = Math.floor(Math.random() * boardSize);
+        maze[x][y] = 1;
+      }
+      // 確保起點和終點是空的
+      maze[0][0] = 0;
+      maze[9][9] = 0;
+    }
+
+    // 渲染迷宮
+    function renderMaze() {
+      const board = document.getElementById('game-board');
+      board.innerHTML = '';  // 清空畫面
+      for (let i = 0; i < boardSize; i++) {
+        for (let j = 0; j < boardSize; j++) {
+          const cell = document.createElement('div');
+          cell.classList.add('cell');
+          if (maze[i][j] === 1) {
+            cell.classList.add('wall');  // 牆壁
+          }
+          if (i === player.x && j === player.y) {
+            cell.classList.add('player');  // 玩家位置
+          }
+          if (i === exit.x && j === exit.y) {
+            cell.classList.add('exit');  // 出口
+          }
+          board.appendChild(cell);
+        }
+      }
+    }
+
+    // 移動玩家
+    function movePlayer(dx, dy) {
+      const newX = player.x + dx;
+      const newY = player.y + dy;
+      
+      // 確保玩家移動不會出界或撞牆
+      if (newX >= 0 && newX < boardSize && newY >= 0 && newY < boardSize && maze[newX][newY] !== 1) {
+        player.x = newX;
+        player.y = newY;
+        
+        // 檢查是否到達出口
+        if (player.x === exit.x && player.y === exit.y) {
+          alert('恭喜你，成功找到出口！');
+        }
+        renderMaze();
+      }
+    }
+
+    // 監聽鍵盤事件
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowUp') {
+        movePlayer(-1, 0);  // 上
+      } else if (e.key === 'ArrowDown') {
+        movePlayer(1, 0);  // 下
+      } else if (e.key === 'ArrowLeft') {
+        movePlayer(0, -1);  // 左
+      } else if (e.key === 'ArrowRight') {
+        movePlayer(0, 1);  // 右
+      }
+    });
+
+    // 初始化遊戲
+    function initGame() {
+      generateMaze();
+      renderMaze();
+    }
+
+    // 開始遊戲
+    initGame();
+  </script>
+
+</body>
+</html>
